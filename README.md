@@ -26,12 +26,12 @@ to install the other dependencies.
 ## How to use
 Inside the project's directory run:
 ```
-python inpainter <path to image> <path to mask>
+python __main__.py [-h] [-ps PATCH_SIZE] [-o OUTPUT] [-p] [-i INPUT_IMAGE] [-m MASK]
 ```
-You can also pass the `--plot-progress` argument to watch the image being created. For example, use:
+You can also pass the `-p` argument to watch the image being created. For example, use:
 ```
-python inpainter resources/image1.jpg resources/mask1.jpg --plot-progress
+python __main__.py -i ../resources/image1.jpg -m ../resources/mask1.jpg
 ```
 to process image1 inside resources folder using mask1 while printing each result. I provided some images from the paper inside the resources folder.
 
-Use `python inpainter -h` to show the available arguments.
+Use `python __main__.py -h` to show the available arguments.
