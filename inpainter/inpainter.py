@@ -8,10 +8,10 @@ from scipy.ndimage.filters import convolve
 
 class Inpainter():
     def __init__(self, image, mask, patch_size=9, plot_progress=False):
-        self.image = image.astype('uint8')
-        self.mask = mask.round().astype('uint8')
-        self.patch_size = patch_size
-        self.plot_progress = plot_progress
+        self.image = image.astype('uint8')  # 原图像480*360*3
+        self.mask = mask.round().astype('uint8')  # 原掩膜480*360*1
+        self.patch_size = patch_size  # 固定补丁大小
+        self.plot_progress = plot_progress  # 是否显示中间过程
 
         # Non initialized attributes
         self.working_image = None
@@ -69,8 +69,13 @@ class Inpainter():
         rgb_white_region = self._to_rgb(white_region)
         image += rgb_white_region
 
+        plot_image_path = '../resources/plot_process/test001/image1'
+        remaining = self.working_mask.sum()
+        plot_image_path = plot_image_path + str(int(height * width - remaining)) + '.jpg'
+
         plt.clf()
         plt.imshow(image)
+        plt.savefig(plot_image_path)
         plt.draw()
         plt.pause(0.001)  # TODO: check if this is necessary
 
@@ -278,7 +283,7 @@ class Inpainter():
         height, width = self.working_image.shape[:2]
         remaining = self.working_mask.sum()
         total = height * width
-        print('%d of %d completed' % (total-remaining, total))
+        print('%d of %d completed' % (remaining, total))
         return remaining == 0
 
     @staticmethod

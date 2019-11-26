@@ -3,12 +3,11 @@ from skimage.io import imread, imsave
 
 from inpainter import Inpainter
 
-
 def main():
     args = parse_args()
 
-    image = imread(args.input_image)
-    mask = imread(args.mask, as_grey=True)
+    image = imread(args.input_image)  # 读取图像，存储顺序是RGB
+    mask = imread(args.mask, as_grey=True)  # 读取掩膜，存储顺序是RGB
 
     output_image = Inpainter(
         image,
@@ -35,17 +34,20 @@ def parse_args():
         default='output.jpg'
     )
     parser.add_argument(
+        '-p',
         '--plot-progress',
         help='plot each generated image',
         action='store_true',
-        default=False
+        default=True
     )
     parser.add_argument(
-        'input_image',
+        '-i',
+        '--input_image',
         help='the image containing objects to be removed'
     )
     parser.add_argument(
-        'mask',
+        '-m',
+        '--mask',
         help='the mask of the region to be removed'
     )
     return parser.parse_args()
