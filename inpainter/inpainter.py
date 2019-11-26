@@ -15,6 +15,7 @@ class Inpainter():
         self.plot_progress = plot_progress  # 是否显示中间过程
 
         # Non initialized attributes 未初始化参数
+        self.plot_image_path = '../resources/plot_process/test002/image1/'  # 中间文件保存路径
         self.working_image = None
         self.working_mask = None
         self.front = None
@@ -70,7 +71,7 @@ class Inpainter():
         rgb_white_region = self._to_rgb(white_region)
         image += rgb_white_region
 
-        plot_image_path = '../resources/plot_process/test001/image1/'  # 中间文件保存路径
+        plot_image_path = self.plot_image_path  # 中间文件保存路径
         remaining = self.working_mask.sum()
         plot_image_path = plot_image_path + str(int(height * width - remaining)) + '.jpg'
 
@@ -288,14 +289,15 @@ class Inpainter():
         euclidean_distance = np.sqrt(
             (target_patch[0][0] - source_patch[0][0])**2 +
             (target_patch[1][0] - source_patch[1][0])**2
-        )  # tie-breaker factor 待修复区域和当前补丁原点距离 TODO：为什么要加这一项？
+        )  # tie-breaker factor 待修复区域和当前补丁原点距离    为什么要加这一项？
         return squared_distance + euclidean_distance
+        # return squared_distance  # TODO:针对代码运行结果与论文结果不一致的问题，尝试删去附加项
 
     def _finished(self):
         height, width = self.working_image.shape[:2]  # 480*360
         remaining = self.working_mask.sum()  # 待修复区域总像素数
         total = height * width  # 图像像素总数
-        print('%d of %d completed' % (remaining, total))
+        print('%d of %d completed' % (total - remaining, total))
         return remaining == 0  # 循环结束条件，当remaining==0时，返回true，结束循环
         # return remaining <= 5  # 循环结束条件，当remaining<=5时，返回true，结束循环
 
