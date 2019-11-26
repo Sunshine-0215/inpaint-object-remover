@@ -38,7 +38,7 @@ def parse_args():
         '--plot-progress',
         help='plot each generated image',
         action='store_true',
-        default=True
+        default=False
     )
     parser.add_argument(
         '-i',
