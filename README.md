@@ -34,6 +34,24 @@ to process image1 inside resources folder using mask1 while printing each result
 
 Use `python __main__.py -h` to show the available arguments.
 
+## Performance
+
+It proformance well on a small scale, however, with scale increasing, it gets worst.
+
+Some reslut of repair:
+
+result of image2
+
+![result2](resources/result2.gif) 
+
+result of image3
+
+![result2](resources/result3.gif) 
+
+result of image9
+
+![result2](resources/result9.gif)
+
 ## Anvanced version
 
 An anvanced version of this programme has been posted on here, it performances better than before.
