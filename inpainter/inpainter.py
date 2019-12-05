@@ -16,7 +16,7 @@ class Inpainter():
         self.plot_progress = plot_progress  # 是否显示中间过程
 
         # Non initialized attributes 未初始化参数
-        self.plot_image_path = '../resources/plot_process/test001/image8/'  # 中间文件保存路径
+        self.plot_image_path = '../resources/plot_process/test002/image8/'  # 中间文件保存路径
         self.working_image = None
         self.working_mask = None
         self.front = None
@@ -296,8 +296,8 @@ class Inpainter():
             (target_patch[0][0] - source_patch[0][0])**2 +
             (target_patch[1][0] - source_patch[1][0])**2
         )  # tie-breaker factor 待修复区域和当前补丁原点距离    为什么要加这一项？
-        return squared_distance + euclidean_distance
-        # return squared_distance  # TODO:针对代码运行结果与论文结果不一致的问题，尝试删去附加项
+        # return squared_distance + euclidean_distance
+        return squared_distance  # TODO:针对代码运行结果与论文结果不一致的问题，尝试删去附加项
 
     def _finished(self):
         height, width = self.working_image.shape[:2]  # 480*360
