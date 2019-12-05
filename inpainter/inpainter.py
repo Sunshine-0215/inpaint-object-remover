@@ -16,7 +16,7 @@ class Inpainter():
         self.plot_progress = plot_progress  # 是否显示中间过程
 
         # Non initialized attributes 未初始化参数
-        self.plot_image_path = '../resources/plot_process/test001/image9/'  # 中间文件保存路径
+        self.plot_image_path = '../resources/plot_process/test001/image3/'  # 中间文件保存路径
         self.working_image = None
         self.working_mask = None
         self.front = None
