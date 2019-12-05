@@ -43,7 +43,7 @@ class Inpainter():
             find_start_time = time.time()  # 开始查找补丁的计时
             source_patch = self._find_source_patch(target_pixel)  # 寻找最佳匹配的补丁
             print('Time to find best: %f seconds'
-                  % (time.time()-find_start_time))  # 查找用时
+                  % (time.time() - find_start_time))  # 查找用时
 
             self._update_image(target_pixel, source_patch)  # 更新原图片，将补丁复制到待修复区域
 
@@ -66,7 +66,7 @@ class Inpainter():
 
         # Remove the target region from the image 去除原图像的掩膜区域
         inverse_mask = 1 - self.working_mask  # 保留区域为１，掩膜区域为０
-        rgb_inverse_mask = self._to_rgb(inverse_mask)  #重建掩膜区域，全填充0
+        rgb_inverse_mask = self._to_rgb(inverse_mask)  # 重建掩膜区域，全填充0
         image = self.working_image * rgb_inverse_mask
 
         # Fill the target borders with red 边界填充红色
@@ -106,7 +106,7 @@ class Inpainter():
         self.data = np.zeros([height, width])  # 数据项初始化，全区域填充0
 
         self.working_image = np.copy(self.image)  # 复制原图像，准备开始填充
-        self.working_mask = np.copy(self.mask)  #复制掩膜，准备开始填充
+        self.working_mask = np.copy(self.mask)  # 复制掩膜，准备开始填充
 
     def _find_front(self):
         """ Find the front using laplacian on the mask
@@ -145,7 +145,7 @@ class Inpainter():
             # kkk = sum(sum(self._patch_data(self.confidence, patch)))
             new_confidence[point[0], point[1]] = sum(
                 sum(self._patch_data(self.confidence, patch))  # 单个sum只能合并一维的数据
-            )/self._patch_area(patch)
+            ) / self._patch_area(patch)
 
         self.confidence = new_confidence  # 更新置信度矩阵
 
@@ -154,9 +154,9 @@ class Inpainter():
         normal = self._calc_normal_matrix()  # 法向量与归一化因子比
         gradient = self._calc_gradient_matrix()  # 等照度线的垂线
 
-        normal_gradient = normal*gradient  # 数据项计算公式
+        normal_gradient = normal * gradient  # 数据项计算公式
         self.data = np.sqrt(
-            normal_gradient[:, :, 0]**2 + normal_gradient[:, :, 1]**2
+            normal_gradient[:, :, 0] ** 2 + normal_gradient[:, :, 1] ** 2
         ) + 0.001  # To be sure to have a greater than 0 data
         # TODO：此处的公式是否最优？
 
@@ -169,12 +169,12 @@ class Inpainter():
         normal = np.dstack((x_normal, y_normal))  # 合并梯度结果
 
         height, width = normal.shape[:2]
-        norm = np.sqrt(y_normal**2 + x_normal**2) \
-                 .reshape(height, width, 1) \
-                 .repeat(2, axis=2)
+        norm = np.sqrt(y_normal ** 2 + x_normal ** 2) \
+            .reshape(height, width, 1) \
+            .repeat(2, axis=2)
         norm[norm == 0] = 1  # 防止除以0
 
-        unit_normal = normal/norm  # 数据项计算公式
+        unit_normal = normal / norm  # 数据项计算公式
         return unit_normal
         # TODO：边缘算子取值会对数据项计算有影响吗
 
@@ -186,7 +186,7 @@ class Inpainter():
         grey_image[self.working_mask == 1] = None  # 计算等照度线前去除掩膜区域(working_mask==1)的影响
 
         gradient = np.nan_to_num(np.array(np.gradient(grey_image)))
-        gradient_val = np.sqrt(gradient[0]**2 + gradient[1]**2)
+        gradient_val = np.sqrt(gradient[0] ** 2 + gradient[1] ** 2)
         max_gradient = np.zeros([height, width, 2])
 
         front_positions = np.argwhere(self.front == 1)  # 返回边界的位置，使用边界各像素在图像中的位置表示
@@ -228,8 +228,8 @@ class Inpainter():
         for y in range(height - patch_height + 1):
             for x in range(width - patch_width + 1):
                 source_patch = [
-                    [y, y + patch_height-1],
-                    [x, x + patch_width-1]
+                    [y, y + patch_height - 1],
+                    [x, x + patch_width - 1]
                 ]
                 if self._patch_data(self.working_mask, source_patch).sum() != 0:  # 确定此区域中包含边界
                     continue
@@ -259,23 +259,23 @@ class Inpainter():
         source_data = self._patch_data(self.working_image, source_patch)  # 补丁区域图像信息
         target_data = self._patch_data(self.working_image, target_patch)  # 待修复区域图像信息
 
-        new_data = source_data*rgb_mask + target_data*(1-rgb_mask)
+        new_data = source_data * rgb_mask + target_data * (1 - rgb_mask)
         # 新填充区域=     (待修复区域)           +      (原图区域)  完整补丁
 
         self._copy_to_patch(self.working_image, target_patch, new_data)  # 复制完整补丁到原图的待修复区域
         self._copy_to_patch(self.working_mask, target_patch, 0)  # 复制0到掩膜上的待修复区域，即缩小边界
 
     def _get_patch(self, point):  # 返回补丁范围，并没有针对规定图像
-        half_patch_size = (self.patch_size-1)//2  # 地板除，返回比真正的商小的最接近的数字
+        half_patch_size = (self.patch_size - 1) // 2  # 地板除，返回比真正的商小的最接近的数字
         height, width = self.working_image.shape[:2]  # 480*360  point[0] = 480,为图像高度，360为图像宽度
         patch = [
             [
                 max(0, point[0] - half_patch_size),  # 补丁上边界，与0比较防止越界
-                min(point[0] + half_patch_size, height-1)  # 补丁下边界，与图像的高比较防止越界
+                min(point[0] + half_patch_size, height - 1)  # 补丁下边界，与图像的高比较防止越界
             ],
             [
                 max(0, point[1] - half_patch_size),  # 补丁左边界，与0比较防止越界
-                min(point[1] + half_patch_size, width-1)  # 补丁右边界，与图像的宽比较防止越界
+                min(point[1] + half_patch_size, width - 1)  # 补丁右边界，与图像的宽比较防止越界
             ]
         ]
         return patch
@@ -291,10 +291,10 @@ class Inpainter():
             image,
             source_patch
         ) * rgb_mask
-        squared_distance = ((target_data - source_data)**2).sum()  # 对应元素差的平方之和
+        squared_distance = ((target_data - source_data) ** 2).sum()  # 对应元素差的平方之和
         euclidean_distance = np.sqrt(
-            (target_patch[0][0] - source_patch[0][0])**2 +
-            (target_patch[1][0] - source_patch[1][0])**2
+            (target_patch[0][0] - source_patch[0][0]) ** 2 +
+            (target_patch[1][0] - source_patch[1][0]) ** 2
         )  # tie-breaker factor 待修复区域和当前补丁原点距离    为什么要加这一项？
         # return squared_distance + euclidean_distance
         return squared_distance  # TODO:针对代码运行结果与论文结果不一致的问题，尝试删去附加项
@@ -309,24 +309,24 @@ class Inpainter():
 
     @staticmethod
     def _patch_area(patch):  # 返回补丁面积
-        return (1+patch[0][1]-patch[0][0]) * (1+patch[1][1]-patch[1][0])
+        return (1 + patch[0][1] - patch[0][0]) * (1 + patch[1][1] - patch[1][0])
 
     @staticmethod
     def _patch_shape(patch):  # 返回补丁大小
-        return (1+patch[0][1]-patch[0][0]), (1+patch[1][1]-patch[1][0])
+        return (1 + patch[0][1] - patch[0][0]), (1 + patch[1][1] - patch[1][0])
 
     @staticmethod
     def _patch_data(source, patch):  # 根据patch位置返回所给定的图像（原图或置信度）的补丁数据
         return source[
-            patch[0][0]:patch[0][1]+1,
-            patch[1][0]:patch[1][1]+1
-        ]
+               patch[0][0]:patch[0][1] + 1,
+               patch[1][0]:patch[1][1] + 1
+               ]
 
     @staticmethod
     def _copy_to_patch(dest, dest_patch, data):  # 根据data，填充dest图像中dest_patch处的值
         dest[
-            dest_patch[0][0]:dest_patch[0][1]+1,
-            dest_patch[1][0]:dest_patch[1][1]+1
+        dest_patch[0][0]:dest_patch[0][1] + 1,
+        dest_patch[1][0]:dest_patch[1][1] + 1
         ] = data
 
     @staticmethod
