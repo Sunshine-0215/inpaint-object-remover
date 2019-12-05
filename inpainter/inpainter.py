@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import os
 from skimage.io import imread, imsave
 from skimage.color import rgb2grey, rgb2lab
 from skimage.filters import laplace
@@ -15,7 +16,7 @@ class Inpainter():
         self.plot_progress = plot_progress  # 是否显示中间过程
 
         # Non initialized attributes 未初始化参数
-        self.plot_image_path = '../resources/plot_process/test002/image1/'  # 中间文件保存路径
+        self.plot_image_path = '../resources/plot_process/test001/image9/'  # 中间文件保存路径
         self.working_image = None
         self.working_mask = None
         self.front = None
@@ -47,7 +48,11 @@ class Inpainter():
             self._update_image(target_pixel, source_patch)  # 更新原图片，将补丁复制到待修复区域
 
             keep_going = not self._finished()  # 循环结束条件判断
+            if not keep_going:
+                if self.plot_progress:  # 若显示中间过程选项打开，则输出中间过程图片
+                    self._plot_image()  # 输出中间过程图片
 
+        os.system('convert -delay 60 -loop 0 ' + self.plot_image_path + '*.jpg ' + self.plot_image_path + 'result.gif')
         print('Took %f seconds to complete' % (time.time() - start_time))  # 程序运行总时间
         return self.working_image  # 返回修复完的图像
 
