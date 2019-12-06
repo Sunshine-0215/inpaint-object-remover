@@ -174,9 +174,7 @@ class Inpainter():
         normal = np.dstack((x_normal, y_normal))  # 合并梯度结果
 
         height, width = normal.shape[:2]
-        norm = np.sqrt(y_normal ** 2 + x_normal ** 2) \
-            .reshape(height, width, 1) \
-            .repeat(2, axis=2)
+        norm = np.sqrt(y_normal ** 2 + x_normal ** 2).reshape(height, width, 1).repeat(2, axis=2)
         norm[norm == 0] = 1  # 防止除以0
 
         unit_normal = normal / norm  # 数据项计算公式
@@ -189,6 +187,7 @@ class Inpainter():
 
         grey_image = rgb2grey(self.working_image)
         grey_image[self.working_mask == 1] = None  # 计算等照度线前去除掩膜区域(working_mask==1)的影响
+
         gradient = np.nan_to_num(np.array(np.gradient(grey_image)))  # 获取全图每一个像素点的梯度，掩膜区域用0(或无穷大的任意数字)填充，尺寸为2*height*width（x，y方向）
         gradient_val = np.sqrt(gradient[0] ** 2 + gradient[1] ** 2)  # 获取全图每一个像素点的梯度大小
         max_gradient = np.zeros([height, width, 2])
@@ -196,8 +195,8 @@ class Inpainter():
         front_positions = np.argwhere(self.front == 1)  # 返回边界的位置，使用边界各像素在图像中的位置表示
         for point in front_positions:  # 遍历图像边界
             patch = self._get_patch(point)  # 取边界上的各像素对应补丁范围
-            patch_y_gradient = self._patch_data(gradient[0], patch)  # 梯度交换
-            patch_x_gradient = self._patch_data(gradient[1], patch)  # 梯度交换 y-x
+            patch_y_gradient = self._patch_data(gradient[0], patch)  # 梯度交换  gradient[0] = X轴梯度
+            patch_x_gradient = self._patch_data(gradient[1], patch)  # 梯度交换  gradient[1] = Y轴梯度
             patch_gradient_val = self._patch_data(gradient_val, patch)  # 边界上这个像素点对应的补丁内，所有像素点的梯度大小
             patch_max_pos = np.unravel_index(patch_gradient_val.argmax(), patch_gradient_val.shape)  # 查找这个区域内最大梯度
             # 原作者代码，这个应该有问题

@@ -46,7 +46,7 @@ result of image2
 
 result of image3
 
-![result2](resources/result3.gif) 
+![result2](resources/result8.gif) 
 
 result of image9
 
